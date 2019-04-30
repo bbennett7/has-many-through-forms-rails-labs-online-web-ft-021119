@@ -1,6 +1,8 @@
 class PostsController < ApplicationController
   def show
-    @post = Post.find(params[:id])
+    @post = Post.find_by_id(params[:id])
+    @comment = Comment.new
+    @comment.user = User.new
   end
 
   def index
@@ -12,13 +14,18 @@ class PostsController < ApplicationController
   end
 
   def create
-    post = Post.create(post_params)
-    redirect_to post
+    #binding.pry
+    @post = Post.new(post_params)
+    if @post.save
+      redirect_to post_path(@post)
+    else
+      render :new
+    end
   end
 
   private
 
   def post_params
-    params.require(:post).permit(:title, :content, category_ids:[], categories_attributes: [:name])
+    params.require(:post).permit(:title, :content, category_ids:[], categories_attributes: [:name], user_attributes: [:username, :email])
   end
 end
